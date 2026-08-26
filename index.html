@@ -132,10 +132,81 @@
   footer{ text-align:center; padding:3.2rem 6vw 3.6rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem; letter-spacing:0.1em; color:rgba(251,243,231,0.35); }
 
   @media (prefers-reduced-motion: reduce){ *{animation-duration:0.01ms !important; animation-iteration-count:1 !important;} html{scroll-behavior:auto;} }
+
+  /* ---------- LOCK SCREEN ---------- */
+  .lock-screen{
+    position:fixed; inset:0; z-index:9999; display:flex; align-items:center; justify-content:center;
+    padding:6vw;
+    background:
+      radial-gradient(ellipse at 20% 10%, rgba(229,72,107,0.20), transparent 55%),
+      radial-gradient(ellipse at 85% 85%, rgba(246,168,188,0.16), transparent 50%),
+      linear-gradient(180deg, #1c1120 0%, var(--ink) 55%, #2c1b32 100%);
+  }
+  .lock-screen.unlocked{ display:none; }
+  .lock-card{
+    background:var(--paper); color:var(--ink); border-radius:10px; padding:2.6rem 2rem;
+    max-width:360px; width:100%; text-align:center; box-shadow:0 30px 60px -10px rgba(0,0,0,0.55);
+  }
+  .lock-heart{ font-size:2.4rem; color:var(--heart-red); margin-bottom:0.6rem; }
+  .lock-card h2{ font-family:'Fraunces',serif; font-weight:500; font-size:1.4rem; margin-bottom:0.5rem; }
+  .lock-card p{ font-size:0.85rem; color:#6b5c72; margin-bottom:1.3rem; line-height:1.5; }
+  .lock-card input{
+    width:100%; padding:0.75rem 0.9rem; border-radius:6px; border:1px solid rgba(36,22,41,0.15);
+    font-family:'Sora',sans-serif; font-size:0.95rem; margin-bottom:0.9rem; outline:none; text-align:center;
+  }
+  .lock-card input:focus{ border-color:var(--heart-red); }
+  .lock-card button{
+    width:100%; padding:0.8rem; border:none; border-radius:6px; background:var(--heart-red); color:var(--cream);
+    font-family:'JetBrains Mono',monospace; font-size:0.75rem; letter-spacing:0.1em; text-transform:uppercase;
+    cursor:pointer; transition:background .2s ease, color .2s ease;
+  }
+  .lock-card button:hover{ background:var(--gold); color:var(--ink); }
+  .lock-error{ color:var(--heart-red); font-size:0.8rem; margin-top:0.8rem; margin-bottom:0; display:none; }
+  .lock-error.show{ display:block; }
 </style>
 </head>
 <body>
 <canvas id="heartsBg"></canvas>
+
+<div class="lock-screen" id="lockScreen">
+  <div class="lock-card">
+    <div class="lock-heart">♡</div>
+    <h2>This one's just for you</h2>
+    <p>Enter the password to open your page</p>
+    <input type="password" id="lockInput" placeholder="Password" autocomplete="off">
+    <button id="lockBtn">Unlock</button>
+    <p class="lock-error" id="lockError">That's not quite it — try again</p>
+  </div>
+</div>
+
+<script>
+  (function(){
+    const LOCK_PASSWORD = "2708Preethi";
+    const lockScreen = document.getElementById('lockScreen');
+    const lockInput = document.getElementById('lockInput');
+    const lockBtn = document.getElementById('lockBtn');
+    const lockError = document.getElementById('lockError');
+
+    function tryUnlock(){
+      if(lockInput.value === LOCK_PASSWORD){
+        localStorage.setItem('bdayUnlocked', 'yes');
+        lockScreen.classList.add('unlocked');
+      } else {
+        lockError.classList.add('show');
+        lockInput.value = '';
+        lockInput.focus();
+      }
+    }
+    lockBtn.addEventListener('click', tryUnlock);
+    lockInput.addEventListener('keydown', e => { if(e.key === 'Enter') tryUnlock(); });
+
+    if(localStorage.getItem('bdayUnlocked') === 'yes'){
+      lockScreen.classList.add('unlocked');
+    } else {
+      lockInput.focus();
+    }
+  })();
+</script>
 
 <section class="hero">
   <div class="hero-content">
